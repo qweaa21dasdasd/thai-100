@@ -25,16 +25,23 @@
             background: #111;
             position: relative;
             box-shadow: 0 0 20px rgba(0,0,0,0.5);
+            overflow: hidden;
         }
         video {
             width: 100%;
             height: 100%;
             object-fit: contain;
+            transition: filter 0.3s;
+        }
+        video.blur {
+            filter: blur(20px);
         }
         #controls-hint {
             margin-top: 20px;
             text-align: center;
             color: #888;
+            width: 100%;
+            max-width: 800px;
         }
         #current-info {
             position: absolute;
@@ -45,6 +52,18 @@
             border-radius: 4px;
             font-size: 14px;
             pointer-events: none;
+            z-index: 10;
+        }
+        #group-selector {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            border: 1px solid #555;
+            padding: 5px;
+            border-radius: 4px;
+            z-index: 10;
         }
         .key {
             display: inline-block;
@@ -54,6 +73,61 @@
             font-family: monospace;
             margin: 0 2px;
             border: 1px solid #555;
+        }
+        
+        /* Quiz UI */
+        #quiz-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.85);
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 20;
+        }
+        .quiz-active #quiz-overlay {
+            display: flex;
+        }
+        .quiz-title {
+            font-size: 24px;
+            margin-bottom: 20px;
+            color: #4CAF50;
+        }
+        .quiz-question {
+            font-size: 18px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        .quiz-options {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            width: 80%;
+        }
+        .quiz-btn {
+            background: #333;
+            color: white;
+            border: 1px solid #555;
+            padding: 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background 0.2s;
+        }
+        .quiz-btn:hover {
+            background: #444;
+        }
+        .quiz-btn.correct {
+            background: #2e7d32;
+            border-color: #4CAF50;
+        }
+        .quiz-btn.wrong {
+            background: #c62828;
+            border-color: #ef5350;
         }
         
         /* Mobile controls */
@@ -105,6 +179,20 @@
 <div id="player-container">
     <video id="video-player" playsinline></video>
     <div id="current-info">加载中...</div>
+    <select id="group-selector" onchange="changeGroup(this.value)">
+        <!-- Options populated by JS -->
+    </select>
+    
+    <div id="quiz-overlay">
+        <div class="quiz-title">阶段测试</div>
+        <div class="quiz-question" id="quiz-question-text">听录音，选择正确的中文含义</div>
+        <div class="quiz-options" id="quiz-options">
+            <!-- Buttons injected by JS -->
+        </div>
+        <div id="quiz-result" style="margin-top: 20px; font-weight: bold;"></div>
+        <button id="quiz-next-btn" class="control-btn main-btn" style="margin-top: 20px; display:none;" onclick="nextQuizQuestion()">下一题</button>
+        <button id="quiz-close-btn" class="control-btn" style="margin-top: 20px; display:none;" onclick="closeQuiz()">结束测试</button>
+    </div>
 </div>
 
 <div id="controls-hint">
@@ -122,13 +210,25 @@
     let currentIndex = 0;
     let loopCount = 0;
     const MAX_LOOPS = 3;
+    const GROUP_SIZE = 20;
+    
+    // Quiz State
+    let isQuizMode = false;
+    let quizQuestions = [];
+    let currentQuizIndex = 0;
+    let quizScore = 0;
     
     const videoPlayer = document.getElementById('video-player');
     const infoDisplay = document.getElementById('current-info');
     const statusMsg = document.getElementById('status-msg');
+    const groupSelector = document.getElementById('group-selector');
+    const playerContainer = document.getElementById('player-container');
+    const quizOverlay = document.getElementById('quiz-overlay');
 
     // Handle video ended event
     videoPlayer.addEventListener('ended', () => {
+        if (isQuizMode) return; // Don't auto-loop in quiz mode
+        
         loopCount++;
         if (loopCount < MAX_LOOPS) {
             videoPlayer.play();
@@ -143,6 +243,7 @@
         .then(response => response.json())
         .then(data => {
             videos = data;
+            initGroups();
             if (videos.length > 0) {
                 loadVideo(0);
             } else {
@@ -154,29 +255,190 @@
             infoDisplay.textContent = "加载列表失败";
         });
 
+    function initGroups() {
+        const totalGroups = Math.ceil(videos.length / GROUP_SIZE);
+        groupSelector.innerHTML = '';
+        for (let i = 0; i < totalGroups; i++) {
+            const start = i * GROUP_SIZE + 1;
+            const end = Math.min((i + 1) * GROUP_SIZE, videos.length);
+            const option = document.createElement('option');
+            option.value = i;
+            option.textContent = `第 ${i + 1} 组 (${start}-${end})`;
+            groupSelector.appendChild(option);
+        }
+    }
+    
+    function changeGroup(groupIndex) {
+        loadVideo(groupIndex * GROUP_SIZE);
+        videoPlayer.focus();
+    }
+
     function loadVideo(index) {
         if (index < 0) index = videos.length - 1;
         if (index >= videos.length) index = 0;
         
+        // Check group boundary for Quiz trigger (only when moving forward)
+        if (index > 0 && index % GROUP_SIZE === 0 && currentIndex === index - 1) {
+            startQuiz(Math.floor((index - 1) / GROUP_SIZE));
+            return;
+        }
+        
         currentIndex = index;
         loopCount = 0; // Reset loop counter
         
+        // Sync selector
+        const currentGroup = Math.floor(currentIndex / GROUP_SIZE);
+        groupSelector.value = currentGroup;
+        
         const filename = videos[currentIndex];
-        // Path is relative to where index.html is served
         videoPlayer.src = `clips_chinese/${filename}`;
+        videoPlayer.classList.remove('blur'); // Ensure no blur
         videoPlayer.play().catch(e => {
-            console.log("Autoplay prevented, waiting for interaction");
+            console.log("Autoplay prevented");
             statusMsg.textContent = "按空格键开始播放";
         });
         
-        // Update info
-        // Remove extension for cleaner display
-        const displayName = filename.replace('.mp4', '').replace(/^\d+_/, '');
+        const displayName = getDisplayName(filename);
         infoDisplay.textContent = `${currentIndex + 1}/${videos.length}: ${displayName}`;
         statusMsg.textContent = `正在播放: ${displayName}`;
     }
+    
+    function getDisplayName(filename) {
+        return filename.replace('.mp4', '').replace(/^\d+_/, '');
+    }
+
+    // --- Quiz Logic ---
+    
+    function startQuiz(groupIndex) {
+        isQuizMode = true;
+        playerContainer.classList.add('quiz-active');
+        videoPlayer.classList.add('blur');
+        videoPlayer.loop = false; // Disable loop for quiz
+        
+        const start = groupIndex * GROUP_SIZE;
+        const end = Math.min((groupIndex + 1) * GROUP_SIZE, videos.length);
+        const groupVideos = videos.slice(start, end);
+        
+        // Generate 5 random questions
+        quizQuestions = [];
+        for (let i = 0; i < 5; i++) {
+            const targetVideo = groupVideos[Math.floor(Math.random() * groupVideos.length)];
+            // Distractors
+            const options = [targetVideo];
+            while (options.length < 4) {
+                const random = groupVideos[Math.floor(Math.random() * groupVideos.length)];
+                if (!options.includes(random)) options.push(random);
+            }
+            // Shuffle options
+            options.sort(() => Math.random() - 0.5);
+            
+            quizQuestions.push({
+                target: targetVideo,
+                options: options
+            });
+        }
+        
+        currentQuizIndex = 0;
+        quizScore = 0;
+        showQuizQuestion();
+    }
+    
+    function showQuizQuestion() {
+        const q = quizQuestions[currentQuizIndex];
+        const optionsContainer = document.getElementById('quiz-options');
+        const resultDiv = document.getElementById('quiz-result');
+        const nextBtn = document.getElementById('quiz-next-btn');
+        const closeBtn = document.getElementById('quiz-close-btn');
+        
+        // Reset UI
+        optionsContainer.innerHTML = '';
+        resultDiv.textContent = '';
+        nextBtn.style.display = 'none';
+        closeBtn.style.display = 'none';
+        
+        // Play Audio (Video is blurred)
+        videoPlayer.src = `clips_chinese/${q.target}`;
+        videoPlayer.play();
+        
+        document.querySelector('.quiz-title').textContent = `听力测试 (${currentQuizIndex + 1}/5)`;
+        
+        q.options.forEach(opt => {
+            const btn = document.createElement('button');
+            btn.className = 'quiz-btn';
+            btn.textContent = getDisplayName(opt);
+            btn.onclick = () => checkAnswer(btn, opt, q.target);
+            optionsContainer.appendChild(btn);
+        });
+    }
+    
+    function checkAnswer(btn, selected, correct) {
+        const buttons = document.querySelectorAll('.quiz-btn');
+        buttons.forEach(b => b.disabled = true); // Disable all
+        
+        const isCorrect = selected === correct;
+        if (isCorrect) {
+            btn.classList.add('correct');
+            quizScore++;
+            document.getElementById('quiz-result').textContent = "回答正确！✅";
+            document.getElementById('quiz-result').style.color = "#4CAF50";
+        } else {
+            btn.classList.add('wrong');
+            // Highlight correct one
+            buttons.forEach(b => {
+                if (getDisplayName(b.textContent) === getDisplayName(getDisplayName(correct))) { // Simple text match check might be safer with data attribs, but this works for now
+                     // Logic fix: extracting text content is safe
+                }
+                // Better way:
+                if (b.textContent === getDisplayName(correct)) {
+                    b.classList.add('correct');
+                }
+            });
+            document.getElementById('quiz-result').textContent = `回答错误 ❌ 正确答案是: ${getDisplayName(correct)}`;
+            document.getElementById('quiz-result').style.color = "#ef5350";
+        }
+        
+        if (currentQuizIndex < quizQuestions.length - 1) {
+            document.getElementById('quiz-next-btn').style.display = 'inline-block';
+        } else {
+            document.getElementById('quiz-close-btn').textContent = `测试结束 (得分: ${quizScore}/5) - 继续学习`;
+            document.getElementById('quiz-close-btn').style.display = 'inline-block';
+        }
+    }
+    
+    function nextQuizQuestion() {
+        currentQuizIndex++;
+        showQuizQuestion();
+    }
+    
+    function closeQuiz() {
+        isQuizMode = false;
+        playerContainer.classList.remove('quiz-active');
+        videoPlayer.classList.remove('blur');
+        
+        // Resume learning from where we left off (start of next group)
+        // The quiz was triggered at index (groupIndex + 1) * GROUP_SIZE
+        // So we just load that index.
+        // We need to calculate it back or store it.
+        // Actually simplest is just load currentIndex + 1 from BEFORE the quiz?
+        // Wait, loadVideo handles index. When we triggered quiz, we were at `index` which was start of next group.
+        // So we should just load that index.
+        
+        // Recalculate next group index
+        const currentGroup = Math.floor((currentIndex) / GROUP_SIZE); // This is the OLD group
+        const nextGroupStartIndex = (currentGroup + 1) * GROUP_SIZE;
+        
+        if (nextGroupStartIndex < videos.length) {
+            loadVideo(nextGroupStartIndex);
+        } else {
+            loadVideo(0); // Restart from beginning if all done
+        }
+    }
 
     function togglePlay() {
+        if (isQuizMode) {
+             videoPlayer.play(); // Replay sound in quiz
+             return;
+        }
         if (videoPlayer.paused) {
             videoPlayer.play();
             statusMsg.textContent = "播放中";
@@ -187,15 +449,18 @@
     }
 
     function prevVideo() {
+        if (isQuizMode) return;
         loadVideo(currentIndex - 1);
     }
 
     function nextVideo() {
+        if (isQuizMode) return;
         loadVideo(currentIndex + 1);
     }
 
     // Keyboard controls
     document.addEventListener('keydown', (e) => {
+        if (isQuizMode) return; // Disable keys during quiz
         switch(e.code) {
             case 'Space':
                 e.preventDefault(); // Prevent scrolling

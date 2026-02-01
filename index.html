@@ -190,8 +190,11 @@
             <!-- Buttons injected by JS -->
         </div>
         <div id="quiz-result" style="margin-top: 20px; font-weight: bold;"></div>
-        <button id="quiz-next-btn" class="control-btn main-btn" style="margin-top: 20px; display:none;" onclick="nextQuizQuestion()">下一题</button>
-        <button id="quiz-close-btn" class="control-btn" style="margin-top: 20px; display:none;" onclick="closeQuiz()">结束测试</button>
+        <div style="margin-top: 20px; display: flex; gap: 10px;">
+             <button id="quiz-skip-btn" class="control-btn" onclick="closeQuiz()">跳过测试</button>
+             <button id="quiz-next-btn" class="control-btn main-btn" style="display:none;" onclick="nextQuizQuestion()">下一题</button>
+             <button id="quiz-close-btn" class="control-btn" style="display:none;" onclick="closeQuiz()">结束测试</button>
+        </div>
     </div>
 </div>
 
@@ -349,12 +352,14 @@
         const resultDiv = document.getElementById('quiz-result');
         const nextBtn = document.getElementById('quiz-next-btn');
         const closeBtn = document.getElementById('quiz-close-btn');
+        const skipBtn = document.getElementById('quiz-skip-btn');
         
         // Reset UI
         optionsContainer.innerHTML = '';
         resultDiv.textContent = '';
         nextBtn.style.display = 'none';
         closeBtn.style.display = 'none';
+        skipBtn.style.display = 'inline-block'; // Always show skip unless finished
         
         // Play Audio (Video is blurred)
         videoPlayer.src = `clips_chinese/${q.target}`;
@@ -397,6 +402,8 @@
             document.getElementById('quiz-result').style.color = "#ef5350";
         }
         
+        document.getElementById('quiz-skip-btn').style.display = 'none'; // Hide skip after answering
+
         if (currentQuizIndex < quizQuestions.length - 1) {
             document.getElementById('quiz-next-btn').style.display = 'inline-block';
         } else {

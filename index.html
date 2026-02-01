@@ -769,10 +769,7 @@
         renderFlashcardView();
         
         const item = groupItems[currentLessonItemIndex];
-        
-        // Auto flip card on last loop? Or keep front?
-        // Let's keep front, maybe flip at end?
-        // User wants "Auto play each word, repeat 5 times".
+        const currentCard = document.querySelector('.flashcard');
         
         // Play audio (Thai only for drill? Or Thai then Chinese? Usually Drill = Target Language)
         playAudio(item.thai, 'th-TH', () => {
@@ -781,10 +778,20 @@
                 // Delay slightly between loops
                 autoPlayTimeout = setTimeout(playNextLessonItem, 500);
             } else {
-                // Move to next item
-                currentLessonItemIndex++;
-                currentLessonItemLoop = 0;
-                autoPlayTimeout = setTimeout(playNextLessonItem, 1000);
+                // Last loop finished
+                
+                // 1. Flip to back (Chinese)
+                if (currentCard && !currentCard.classList.contains('flipped')) {
+                    currentCard.classList.add('flipped');
+                }
+                
+                // 2. Wait 1 second (user reads Chinese)
+                // 3. Move to next item
+                autoPlayTimeout = setTimeout(() => {
+                    currentLessonItemIndex++;
+                    currentLessonItemLoop = 0;
+                    playNextLessonItem();
+                }, 1000); // 1 second delay
             }
         });
     }

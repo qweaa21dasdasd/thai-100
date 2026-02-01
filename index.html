@@ -217,9 +217,9 @@
     
     // Quiz State
     let isQuizMode = false;
-    let quizQuestions = [];
     let currentQuizIndex = 0;
     let quizScore = 0;
+    let currentQuizQuestion = null;
     
     const videoPlayer = document.getElementById('video-player');
     const infoDisplay = document.getElementById('current-info');
@@ -318,28 +318,42 @@
         videoPlayer.classList.add('blur');
         videoPlayer.loop = false; // Disable loop for quiz
         
+        currentQuizIndex = 0;
+        quizScore = 0;
+        showQuizQuestion();
+    }
+    
+    function generateQuestion() {
+        // Calculate group range based on current video index (which triggered the quiz)
+        // Note: currentIndex is at the start of the NEXT group when this triggers, so we look back
+        // Or we pass groupIndex. Let's rely on currentIndex logic or pass it.
+        // Actually startQuiz receives groupIndex. We can use that.
+        // Re-deriving groupIndex from current state:
+        // When quiz starts, we are logically at the end of a group.
+        
+        // Let's use the videos array directly.
+        // We need to know which group we are testing.
+        // The simple way is to use the group that just finished.
+        // Let's assume we want to test on the group corresponding to (currentIndex - 1)
+        
+        // Better yet, let's just pick from the whole pool? 
+        // No, user wants to test "this group".
+        
+        // We need to persist which group we are quizzing on.
+        // Let's store currentQuizGroupVideos
+    }
+
+    let currentQuizGroupVideos = [];
+
+    function startQuiz(groupIndex) {
+        isQuizMode = true;
+        playerContainer.classList.add('quiz-active');
+        videoPlayer.classList.add('blur');
+        videoPlayer.loop = false; // Disable loop for quiz
+        
         const start = groupIndex * GROUP_SIZE;
         const end = Math.min((groupIndex + 1) * GROUP_SIZE, videos.length);
-        const groupVideos = videos.slice(start, end);
-        
-        // Generate 5 random questions
-        quizQuestions = [];
-        for (let i = 0; i < 5; i++) {
-            const targetVideo = groupVideos[Math.floor(Math.random() * groupVideos.length)];
-            // Distractors
-            const options = [targetVideo];
-            while (options.length < 4) {
-                const random = groupVideos[Math.floor(Math.random() * groupVideos.length)];
-                if (!options.includes(random)) options.push(random);
-            }
-            // Shuffle options
-            options.sort(() => Math.random() - 0.5);
-            
-            quizQuestions.push({
-                target: targetVideo,
-                options: options
-            });
-        }
+        currentQuizGroupVideos = videos.slice(start, end);
         
         currentQuizIndex = 0;
         quizScore = 0;
@@ -347,7 +361,25 @@
     }
     
     function showQuizQuestion() {
-        const q = quizQuestions[currentQuizIndex];
+        // Generate a new question dynamically
+        const groupVideos = currentQuizGroupVideos;
+        const targetVideo = groupVideos[Math.floor(Math.random() * groupVideos.length)];
+        // Distractors
+        const options = [targetVideo];
+        while (options.length < 4) {
+            const random = groupVideos[Math.floor(Math.random() * groupVideos.length)];
+            if (!options.includes(random)) options.push(random);
+        }
+        // Shuffle options
+        options.sort(() => Math.random() - 0.5);
+        
+        currentQuizQuestion = {
+            target: targetVideo,
+            options: options
+        };
+        
+        const q = currentQuizQuestion;
+        
         const optionsContainer = document.getElementById('quiz-options');
         const resultDiv = document.getElementById('quiz-result');
         const nextBtn = document.getElementById('quiz-next-btn');
@@ -359,13 +391,13 @@
         resultDiv.textContent = '';
         nextBtn.style.display = 'none';
         closeBtn.style.display = 'none';
-        skipBtn.style.display = 'inline-block'; // Always show skip unless finished
+        skipBtn.style.display = 'inline-block'; 
         
         // Play Audio (Video is blurred)
         videoPlayer.src = `clips_chinese/${q.target}`;
         videoPlayer.play();
         
-        document.querySelector('.quiz-title').textContent = `听力测试 (${currentQuizIndex + 1}/5)`;
+        document.querySelector('.quiz-title').textContent = `听力测试 (第 ${currentQuizIndex + 1} 题)`;
         
         q.options.forEach(opt => {
             const btn = document.createElement('button');
@@ -390,10 +422,6 @@
             btn.classList.add('wrong');
             // Highlight correct one
             buttons.forEach(b => {
-                if (getDisplayName(b.textContent) === getDisplayName(getDisplayName(correct))) { // Simple text match check might be safer with data attribs, but this works for now
-                     // Logic fix: extracting text content is safe
-                }
-                // Better way:
                 if (b.textContent === getDisplayName(correct)) {
                     b.classList.add('correct');
                 }
@@ -402,16 +430,13 @@
             document.getElementById('quiz-result').style.color = "#ef5350";
         }
         
-        if (currentQuizIndex < quizQuestions.length - 1) {
-            const nextBtn = document.getElementById('quiz-next-btn');
-            nextBtn.textContent = "继续测试";
-            nextBtn.style.display = 'inline-block';
-            // Keep skip button visible
-        } else {
-            document.getElementById('quiz-skip-btn').style.display = 'none'; // Hide skip when finished
-            document.getElementById('quiz-close-btn').textContent = `测试结束 (得分: ${quizScore}/5) - 继续学习`;
-            document.getElementById('quiz-close-btn').style.display = 'inline-block';
-        }
+        // Always show next button (Infinite Mode)
+        const nextBtn = document.getElementById('quiz-next-btn');
+        nextBtn.textContent = "继续测试";
+        nextBtn.style.display = 'inline-block';
+        
+        // Update score display in title (optional but nice)
+        document.querySelector('.quiz-title').textContent = `听力测试 (第 ${currentQuizIndex + 1} 题 | 得分: ${quizScore})`;
     }
     
     function nextQuizQuestion() {

@@ -1,0 +1,296 @@
+[
+  {
+    "thai": "สวัสดี / สบายดีไหม",
+    "phonetic": "sa wat dee / sa-baai dii mái",
+    "chinese": "你好    你好吗",
+    "page": 1
+  },
+  {
+    "thai": "แลวคุณละ",
+    "phonetic": "Leaw Khun la",
+    "chinese": "你呢",
+    "page": 1
+  },
+  {
+    "thai": "โรงเรียน",
+    "phonetic": "Rong reiyn",
+    "chinese": "学校",
+    "page": 2
+  },
+  {
+    "thai": "โรงพยาบาล",
+    "phonetic": "Rong Phyabal",
+    "chinese": "医院",
+    "page": 2
+  },
+  {
+    "thai": "โรงภาพยนตร/โรงหนัง",
+    "phonetic": "Rong hnang",
+    "chinese": "电影院",
+    "page": 2
+  },
+  {
+    "thai": "โรงแรม",
+    "phonetic": "Rong raem",
+    "chinese": "酒店",
+    "page": 2
+  },
+  {
+    "thai": "โรงงาน",
+    "phonetic": "Rong ngan",
+    "chinese": "工厂",
+    "page": 2
+  },
+  {
+    "thai": "รานคา",
+    "phonetic": "Ran Kha",
+    "chinese": "商店",
+    "page": 2
+  },
+  {
+    "thai": "รานสะดวกซื้อ",
+    "phonetic": "Ran sa dwk sux",
+    "chinese": "便利店",
+    "page": 2
+  },
+  {
+    "thai": "รานตัดผม",
+    "phonetic": "Ran taad phom",
+    "chinese": "理发店",
+    "page": 2
+  },
+  {
+    "thai": "รานขายยา",
+    "phonetic": "Ran khay yaa",
+    "chinese": "药店",
+    "page": 2
+  },
+  {
+    "thai": "รานดอกไม",
+    "phonetic": "Ran dwkmai",
+    "chinese": "花店",
+    "page": 2
+  },
+  {
+    "thai": "รานอาหาร",
+    "phonetic": "Ran A Hann",
+    "chinese": "餐厅",
+    "page": 3
+  },
+  {
+    "thai": "บาร",
+    "phonetic": "Bar",
+    "chinese": "酒吧",
+    "page": 3
+  },
+  {
+    "thai": "หางสรรพสินคา",
+    "phonetic": "Hang sappa sinkha",
+    "chinese": "商场",
+    "page": 3
+  },
+  {
+    "thai": "ซุปเปอรมารเก็ต",
+    "phonetic": "supermarkets",
+    "chinese": "超市",
+    "page": 3
+  },
+  {
+    "thai": "ตลาด",
+    "phonetic": "Ta lad",
+    "chinese": "市场",
+    "page": 3
+  },
+  {
+    "thai": "ธนาคาร",
+    "phonetic": "Ta na karn",
+    "chinese": "银行",
+    "page": 3
+  },
+  {
+    "thai": "พิพิธภัณฑ",
+    "phonetic": "pi pitaphan",
+    "chinese": "博物馆",
+    "page": 3
+  },
+  {
+    "thai": "หอศิลป",
+    "phonetic": "Hor sin",
+    "chinese": "美术馆",
+    "page": 3
+  },
+  {
+    "thai": "สนามบิน",
+    "phonetic": "Sa nam bin",
+    "chinese": "机场",
+    "page": 3
+  },
+  {
+    "thai": "บริษัท",
+    "phonetic": "Borrisaat",
+    "chinese": "公司",
+    "page": 3
+  },
+  {
+    "thai": "ออฟฟิศ",
+    "phonetic": "office",
+    "chinese": "办公室",
+    "page": 4
+  },
+  {
+    "thai": "สระวายนํ้า",
+    "phonetic": "sa waai nam",
+    "chinese": "游泳池",
+    "page": 4
+  },
+  {
+    "thai": "สวนสาธารณะ",
+    "phonetic": "suan sa ta ra na",
+    "chinese": "公园",
+    "page": 4
+  },
+  {
+    "thai": "บาน",
+    "phonetic": "Baan",
+    "chinese": "家",
+    "page": 4
+  },
+  {
+    "thai": "หองนํ้า",
+    "phonetic": "Hong Nam",
+    "chinese": "洗手间",
+    "page": 4
+  },
+  {
+    "thai": "หองนอน",
+    "phonetic": "hong non",
+    "chinese": "卧室",
+    "page": 4
+  },
+  {
+    "thai": "หองนั่งเลน",
+    "phonetic": "hong nang lean",
+    "chinese": "客厅",
+    "page": 4
+  },
+  {
+    "thai": "หองครัว",
+    "phonetic": "hong krua",
+    "chinese": "厨房",
+    "page": 4
+  },
+  {
+    "thai": "ตอนนี้คุณอยูที่ไหน?",
+    "phonetic": "Ton Nii Khun Yu Tii Naii",
+    "chinese": "你现在在哪里?",
+    "page": 5
+  },
+  {
+    "thai": "ผมอยูที่...............",
+    "phonetic": "Phom Yu Tii...........",
+    "chinese": "我在...................",
+    "page": 5
+  },
+  {
+    "thai": "ผมอยูที่...............",
+    "phonetic": "Phom Yu Tii...........",
+    "chinese": "我在...................",
+    "page": 6
+  },
+  {
+    "thai": "ผมอยูที่...............",
+    "phonetic": "Phom Yu Tii...........",
+    "chinese": "我在...................",
+    "page": 6
+  },
+  {
+    "thai": "ผมอยูที่...............",
+    "phonetic": "Phom Yu Tii...........",
+    "chinese": "我在...................",
+    "page": 6
+  },
+  {
+    "thai": "ตื่นนอน",
+    "phonetic": "Teun non",
+    "chinese": "起床",
+    "page": 7
+  },
+  {
+    "thai": "นอน",
+    "phonetic": "non",
+    "chinese": "睡觉",
+    "page": 7
+  },
+  {
+    "thai": "ลาง/ซัก",
+    "phonetic": "lang Saak",
+    "chinese": "洗",
+    "page": 7
+  },
+  {
+    "thai": "อาบนํ้า",
+    "phonetic": "Arb Nam",
+    "chinese": "洗澡",
+    "page": 7
+  },
+  {
+    "thai": "สระผม",
+    "phonetic": "Sra Phom",
+    "chinese": "洗头",
+    "page": 7
+  },
+  {
+    "thai": "ลางมือ",
+    "phonetic": "Lang Mue",
+    "chinese": "洗手",
+    "page": 7
+  },
+  {
+    "thai": "แปรงฟัน",
+    "phonetic": "Peang Fan",
+    "chinese": "刷牙",
+    "page": 7
+  },
+  {
+    "thai": "ออกกําลังกาย",
+    "phonetic": "Aok Kam Lang Kaii",
+    "chinese": "锻炼身体",
+    "page": 7
+  },
+  {
+    "thai": "พักผอน",
+    "phonetic": "Phak Paon",
+    "chinese": "休息",
+    "page": 7
+  },
+  {
+    "thai": "เรียน",
+    "phonetic": "Rean",
+    "chinese": "学习",
+    "page": 7
+  },
+  {
+    "thai": "ทํางาน",
+    "phonetic": "Thum Ngan",
+    "chinese": "工作",
+    "page": 8
+  },
+  {
+    "thai": "เลน",
+    "phonetic": "Lean",
+    "chinese": "玩",
+    "page": 8
+  },
+  {
+    "thai": "ทําอาหาร",
+    "phonetic": "Thum Ar Han",
+    "chinese": "做饭",
+    "page": 8
+  },
+  {
+    "thai": "ทําความสะอาด",
+    "phonetic": "Thum Kwam Sa Ard",
+    "chinese": "打扫",
+    "page": 8
+  }
+]

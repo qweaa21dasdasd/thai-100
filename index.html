@@ -1,10 +1,9 @@
-
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>泰语100句洗脑循环</title>
+    <title>泰语学习助手</title>
     <style>
         body {
             margin: 0;
@@ -14,18 +13,57 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: center;
             height: 100vh;
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            overflow: hidden;
         }
+        
+        /* Navigation */
+        #main-nav {
+            width: 100%;
+            background: #111;
+            padding: 10px 0;
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            border-bottom: 1px solid #333;
+            z-index: 100;
+        }
+        .nav-btn {
+            background: transparent;
+            color: #888;
+            border: none;
+            font-size: 16px;
+            cursor: pointer;
+            padding: 5px 10px;
+            font-weight: bold;
+        }
+        .nav-btn.active {
+            color: #fff;
+            border-bottom: 2px solid #0070f3;
+        }
+        
+        /* Views */
+        .view-section {
+            width: 100%;
+            height: calc(100vh - 50px);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            overflow-y: auto;
+            position: relative;
+        }
+        
+        /* Player View Styles */
         #player-container {
-            width: 80%;
+            width: 90%;
             max-width: 800px;
             aspect-ratio: 16/9;
             background: #111;
             position: relative;
             box-shadow: 0 0 20px rgba(0,0,0,0.5);
             overflow: hidden;
+            margin-top: 20px;
         }
         video {
             width: 100%;
@@ -159,6 +197,120 @@
             background: #0051a2;
         }
         
+        /* Lessons View Styles */
+        .lesson-container {
+            width: 90%;
+            max-width: 800px;
+            padding: 20px 0;
+        }
+        .lesson-card {
+            background: #1a1a1a;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            cursor: pointer;
+            transition: transform 0.2s, background 0.2s;
+            border: 1px solid #333;
+        }
+        .lesson-card:hover {
+            transform: translateY(-2px);
+            background: #222;
+            border-color: #0070f3;
+        }
+        .lesson-header {
+            width: 90%;
+            max-width: 800px;
+            display: flex;
+            align-items: center;
+            padding: 20px 0;
+            gap: 20px;
+        }
+        .lesson-content {
+            width: 90%;
+            max-width: 800px;
+            padding-bottom: 50px;
+        }
+        .vocab-item {
+            background: #1a1a1a;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 8px;
+            border-left: 4px solid #0070f3;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .vocab-row {
+            display: grid;
+            grid-template-columns: 1fr auto;
+            align-items: center;
+            gap: 10px;
+        }
+        .vocab-thai {
+            font-size: 20px;
+            font-weight: bold;
+            color: #fff;
+        }
+        .vocab-phonetic {
+            color: #aaa;
+            font-family: monospace;
+        }
+        .vocab-chinese {
+            color: #4CAF50;
+            font-size: 16px;
+        }
+        .action-btn {
+            background: #333;
+            border: 1px solid #555;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+        .action-btn:hover {
+            background: #444;
+        }
+        
+        /* PDF Modal */
+        #pdf-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.9);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 200;
+            flex-direction: column;
+        }
+        #pdf-canvas-container {
+            width: 90%;
+            height: 80%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: auto;
+        }
+        #pdf-canvas {
+            max-width: 100%;
+            max-height: 100%;
+        }
+        .close-modal {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: #fff;
+            color: #000;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        
         /* Responsive visibility */
         .desktop-hint {
             display: none;
@@ -171,44 +323,231 @@
             .desktop-hint {
                 display: block;
             }
+            .vocab-item {
+                flex-direction: row;
+                align-items: center;
+                justify-content: space-between;
+            }
+            .vocab-row {
+                display: block;
+            }
         }
     </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+    <script>
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+    </script>
 </head>
 <body>
 
-<div id="player-container">
-    <video id="video-player" playsinline></video>
-    <div id="current-info">加载中...</div>
-    <select id="group-selector" onchange="changeGroup(this.value)">
-        <!-- Options populated by JS -->
-    </select>
-    
-    <div id="quiz-overlay">
-        <div class="quiz-title">阶段测试</div>
-        <div class="quiz-question" id="quiz-question-text">听录音，选择正确的中文含义</div>
-        <div class="quiz-options" id="quiz-options">
-            <!-- Buttons injected by JS -->
+<nav id="main-nav">
+    <button id="nav-player" class="nav-btn active" onclick="switchView('player')">100句洗脑</button>
+    <button id="nav-lessons" class="nav-btn" onclick="switchView('lessons')">每日课程</button>
+</nav>
+
+<!-- View: Player -->
+<div id="view-player" class="view-section">
+    <div id="player-container">
+        <video id="video-player" playsinline></video>
+        <div id="current-info">加载中...</div>
+        <select id="group-selector" onchange="changeGroup(this.value)">
+            <!-- Options populated by JS -->
+        </select>
+        
+        <div id="quiz-overlay">
+            <div class="quiz-title">阶段测试</div>
+            <div class="quiz-question" id="quiz-question-text">听录音，选择正确的中文含义</div>
+            <div class="quiz-options" id="quiz-options">
+                <!-- Buttons injected by JS -->
+            </div>
+            <div id="quiz-result" style="margin-top: 20px; font-weight: bold;"></div>
+            <div style="margin-top: 20px; display: flex; gap: 10px;">
+                 <button id="quiz-skip-btn" class="control-btn" onclick="closeQuiz()">跳过测试</button>
+                 <button id="quiz-next-btn" class="control-btn main-btn" style="display:none;" onclick="nextQuizQuestion()">继续测试</button>
+                 <button id="quiz-close-btn" class="control-btn" style="display:none;" onclick="closeQuiz()">结束测试</button>
+            </div>
         </div>
-        <div id="quiz-result" style="margin-top: 20px; font-weight: bold;"></div>
-        <div style="margin-top: 20px; display: flex; gap: 10px;">
-             <button id="quiz-skip-btn" class="control-btn" onclick="closeQuiz()">跳过测试</button>
-             <button id="quiz-next-btn" class="control-btn main-btn" style="display:none;" onclick="nextQuizQuestion()">下一题</button>
-             <button id="quiz-close-btn" class="control-btn" style="display:none;" onclick="closeQuiz()">结束测试</button>
+    </div>
+
+    <div id="controls-hint">
+        <p class="desktop-hint"><span class="key">空格</span> 播放/暂停 &nbsp;&nbsp; <span class="key">←</span> 上一个 &nbsp;&nbsp; <span class="key">→</span> 下一个</p>
+        <div class="mobile-controls">
+            <button class="control-btn" onclick="prevVideo()">上一句</button>
+            <button class="control-btn main-btn" onclick="togglePlay()">播放/暂停</button>
+            <button class="control-btn" onclick="nextVideo()">下一句</button>
+        </div>
+        <p id="status-msg">准备就绪</p>
+    </div>
+</div>
+
+<!-- View: Lessons List -->
+<div id="view-lessons" class="view-section" style="display:none;">
+    <div class="lesson-container">
+        <h2>课程列表</h2>
+        <div id="lesson-list">
+            <div class="lesson-card" onclick="openLesson('day2')">
+                <h3>Day 2</h3>
+                <p>日常词汇与句子练习</p>
+            </div>
+            <!-- Future lessons can be added here -->
         </div>
     </div>
 </div>
 
-<div id="controls-hint">
-    <p class="desktop-hint"><span class="key">空格</span> 播放/暂停 &nbsp;&nbsp; <span class="key">←</span> 上一个 &nbsp;&nbsp; <span class="key">→</span> 下一个</p>
-    <div class="mobile-controls">
-        <button class="control-btn" onclick="prevVideo()">上一句</button>
-        <button class="control-btn main-btn" onclick="togglePlay()">播放/暂停</button>
-        <button class="control-btn" onclick="nextVideo()">下一句</button>
+<!-- View: Lesson Detail -->
+<div id="view-lesson-detail" class="view-section" style="display:none;">
+    <div class="lesson-header">
+        <button class="control-btn" onclick="switchView('lessons')">← 返回列表</button>
+        <h2 id="lesson-title">课程内容</h2>
     </div>
-    <p id="status-msg">准备就绪</p>
+    <div id="lesson-content" class="lesson-content">
+        <!-- Content injected by JS -->
+        <p style="text-align:center;">加载中...</p>
+    </div>
+</div>
+
+<!-- PDF Modal -->
+<div id="pdf-modal">
+    <button class="close-modal" onclick="closePdfModal()">关闭</button>
+    <div id="pdf-canvas-container">
+        <canvas id="pdf-canvas"></canvas>
+    </div>
 </div>
 
 <script>
+    // --- View Navigation ---
+    function switchView(viewName) {
+        // Hide all views
+        document.querySelectorAll('.view-section').forEach(el => el.style.display = 'none');
+        document.querySelectorAll('.nav-btn').forEach(el => el.classList.remove('active'));
+        
+        // Show selected view
+        document.getElementById(`view-${viewName}`).style.display = viewName === 'player' ? 'flex' : 'flex';
+        // Adjust display for specific layout if needed
+        if(viewName === 'lessons' || viewName === 'lesson-detail') {
+             document.getElementById(`view-${viewName}`).style.display = 'flex';
+        }
+        
+        // Update nav
+        if (viewName === 'lesson-detail') {
+            document.getElementById('nav-lessons').classList.add('active');
+        } else {
+            document.getElementById(`nav-${viewName}`).classList.add('active');
+        }
+        
+        // Pause video if leaving player
+        if (viewName !== 'player' && !videoPlayer.paused) {
+            videoPlayer.pause();
+        }
+    }
+
+    // --- Lesson Logic ---
+    let currentPdfDoc = null;
+
+    function openLesson(lessonId) {
+        switchView('lesson-detail');
+        document.getElementById('lesson-title').textContent = lessonId === 'day2' ? 'Day 2: 日常词汇与句子' : lessonId;
+        
+        const contentDiv = document.getElementById('lesson-content');
+        contentDiv.innerHTML = '<p style="text-align:center;">加载中...</p>';
+        
+        // Load PDF Doc if needed (for Day 2)
+        if (lessonId === 'day2' && !currentPdfDoc) {
+             const loadingTask = pdfjsLib.getDocument('kejian/Day%202.pdf');
+             loadingTask.promise.then(doc => {
+                 currentPdfDoc = doc;
+                 console.log("PDF Loaded");
+             }).catch(err => console.error("PDF Load Error", err));
+        }
+        
+        fetch(`data/${lessonId}.json`)
+            .then(res => res.json())
+            .then(data => {
+                renderLessonContent(data);
+            })
+            .catch(err => {
+                contentDiv.innerHTML = '<p style="text-align:center; color:red;">加载失败</p>';
+                console.error(err);
+            });
+    }
+    
+    function renderLessonContent(items) {
+        const container = document.getElementById('lesson-content');
+        container.innerHTML = '';
+        
+        items.forEach(item => {
+            const div = document.createElement('div');
+            div.className = 'vocab-item';
+            
+            // Escape quotes for inline onclick
+            const safeThai = item.thai.replace(/'/g, "\\'");
+            const safeChinese = item.chinese.replace(/'/g, "\\'");
+            
+            div.innerHTML = `
+                <div style="flex:1;">
+                    <div class="vocab-row">
+                        <div class="vocab-thai">${item.thai}</div>
+                        <button class="action-btn" onclick="playAudio('${safeThai}', 'th-TH')">🔊 泰语</button>
+                    </div>
+                    <div class="vocab-phonetic">${item.phonetic}</div>
+                    <div class="vocab-row">
+                        <div class="vocab-chinese">${item.chinese}</div>
+                        <button class="action-btn" onclick="playAudio('${safeChinese}', 'zh-CN')">🔊 中文</button>
+                    </div>
+                </div>
+                ${item.page ? `<div style="margin-left:10px;"><button class="action-btn" onclick="viewPdfPage(${item.page})">📄 查看课件图片 (P${item.page})</button></div>` : ''}
+            `;
+            container.appendChild(div);
+        });
+    }
+
+    function playAudio(text, lang) {
+        if ('speechSynthesis' in window) {
+            // Cancel previous
+            window.speechSynthesis.cancel();
+            
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.lang = lang;
+            // Fallback for Thai if not supported by browser default voices?
+            // Usually works on iOS/Android/macOS.
+            window.speechSynthesis.speak(utterance);
+        } else {
+            alert('您的浏览器不支持语音播放');
+        }
+    }
+    
+    function viewPdfPage(pageNum) {
+        if (!currentPdfDoc) {
+            alert("课件正在加载，请稍后再试");
+            return;
+        }
+        
+        document.getElementById('pdf-modal').style.display = 'flex';
+        
+        currentPdfDoc.getPage(pageNum).then(function(page) {
+            const canvas = document.getElementById('pdf-canvas');
+            const ctx = canvas.getContext('2d');
+            
+            // Adjust scale based on screen width
+            const scale = window.innerWidth < 768 ? 0.6 : 1.0;
+            const viewport = page.getViewport({scale: scale});
+
+            canvas.height = viewport.height;
+            canvas.width = viewport.width;
+
+            const renderContext = {
+                canvasContext: ctx,
+                viewport: viewport
+            };
+            page.render(renderContext);
+        });
+    }
+    
+    function closePdfModal() {
+        document.getElementById('pdf-modal').style.display = 'none';
+    }
+
+    // --- Existing Player Logic ---
     let videos = [];
     let currentIndex = 0;
     let loopCount = 0;
@@ -220,6 +559,7 @@
     let currentQuizIndex = 0;
     let quizScore = 0;
     let currentQuizQuestion = null;
+    let currentQuizGroupVideos = [];
     
     const videoPlayer = document.getElementById('video-player');
     const infoDisplay = document.getElementById('current-info');
@@ -312,39 +652,6 @@
 
     // --- Quiz Logic ---
     
-    function startQuiz(groupIndex) {
-        isQuizMode = true;
-        playerContainer.classList.add('quiz-active');
-        videoPlayer.classList.add('blur');
-        videoPlayer.loop = false; // Disable loop for quiz
-        
-        currentQuizIndex = 0;
-        quizScore = 0;
-        showQuizQuestion();
-    }
-    
-    function generateQuestion() {
-        // Calculate group range based on current video index (which triggered the quiz)
-        // Note: currentIndex is at the start of the NEXT group when this triggers, so we look back
-        // Or we pass groupIndex. Let's rely on currentIndex logic or pass it.
-        // Actually startQuiz receives groupIndex. We can use that.
-        // Re-deriving groupIndex from current state:
-        // When quiz starts, we are logically at the end of a group.
-        
-        // Let's use the videos array directly.
-        // We need to know which group we are testing.
-        // The simple way is to use the group that just finished.
-        // Let's assume we want to test on the group corresponding to (currentIndex - 1)
-        
-        // Better yet, let's just pick from the whole pool? 
-        // No, user wants to test "this group".
-        
-        // We need to persist which group we are quizzing on.
-        // Let's store currentQuizGroupVideos
-    }
-
-    let currentQuizGroupVideos = [];
-
     function startQuiz(groupIndex) {
         isQuizMode = true;
         playerContainer.classList.add('quiz-active');

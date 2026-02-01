@@ -213,8 +213,8 @@
             margin-top: 20px;
         }
         .flashcard {
-            width: 90%;
-            max-width: 400px;
+            width: 80%;
+            max-width: 300px;
             aspect-ratio: 3/4;
             position: relative;
             transform-style: preserve-3d;
@@ -251,7 +251,7 @@
         }
         
         .card-thai {
-            font-size: 32px; /* Smaller font for mobile */
+            font-size: 32px;
             font-weight: bold;
             color: #fff;
             margin-bottom: 15px;
@@ -415,11 +415,32 @@
             font-weight: bold;
         }
         
-        /* Responsive visibility */
-        .desktop-hint {
-            display: none;
+        /* Mobile adjustments */
+        @media (max-width: 768px) {
+            .flashcard {
+                 max-width: 300px; /* Even smaller on mobile */
+            }
+            .card-thai {
+                font-size: 28px; /* Reduced from 32px */
+            }
+            .card-chinese {
+                font-size: 22px; /* Reduced from 24px */
+            }
+            .mobile-controls {
+                display: flex;
+            }
+            .desktop-hint {
+                display: none;
+            }
+            .vocab-item {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            .vocab-row {
+                display: grid;
+            }
         }
-        
+
         @media (min-width: 768px) {
             .mobile-controls {
                 display: none;

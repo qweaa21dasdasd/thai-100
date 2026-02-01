@@ -483,6 +483,10 @@
     <div class="lesson-container">
         <h2>课程列表</h2>
         <div id="lesson-list">
+            <div class="lesson-card" onclick="openLesson('day1')">
+                <h3>Day 1</h3>
+                <p>问候与介绍</p>
+            </div>
             <div class="lesson-card" onclick="openLesson('day2')">
                 <h3>Day 2</h3>
                 <p>日常词汇与句子练习</p>
@@ -554,6 +558,8 @@
 
     // --- Lesson Logic ---
     let currentPdfDoc = null;
+    let pdfDocs = {}; // Cache for loaded PDFs
+
     let currentLessonItems = [];
     let currentLessonGroupIndex = 0;
     const LESSON_GROUP_SIZE = 5;
@@ -567,7 +573,11 @@
 
     function openLesson(lessonId) {
         switchView('lesson-detail');
-        document.getElementById('lesson-title').textContent = lessonId === 'day2' ? 'Day 2: 日常词汇与句子' : lessonId;
+        
+        let title = lessonId;
+        if (lessonId === 'day1') title = 'Day 1: 问候与介绍';
+        if (lessonId === 'day2') title = 'Day 2: 日常词汇与句子';
+        document.getElementById('lesson-title').textContent = title;
         
         const contentDiv = document.getElementById('lesson-content');
         contentDiv.innerHTML = '<p style="text-align:center;">加载中...</p>';
@@ -575,13 +585,25 @@
         // Stop any previous autoplay
         stopLessonAutoPlay();
         
-        // Load PDF Doc if needed (for Day 2)
-        if (lessonId === 'day2' && !currentPdfDoc) {
-             const loadingTask = pdfjsLib.getDocument('kejian/Day%202.pdf');
-             loadingTask.promise.then(doc => {
-                 currentPdfDoc = doc;
-                 console.log("PDF Loaded");
-             }).catch(err => console.error("PDF Load Error", err));
+        // PDF Loading Logic
+        const pdfMap = {
+            'day1': 'kejian/Day%201.pdf',
+            'day2': 'kejian/Day%202.pdf'
+        };
+        
+        currentPdfDoc = null; // Reset current doc first
+        
+        if (pdfMap[lessonId]) {
+            if (pdfDocs[lessonId]) {
+                currentPdfDoc = pdfDocs[lessonId];
+                console.log("PDF Loaded from cache");
+            } else {
+                pdfjsLib.getDocument(pdfMap[lessonId]).promise.then(doc => {
+                    pdfDocs[lessonId] = doc;
+                    currentPdfDoc = doc;
+                    console.log("PDF Loaded");
+                }).catch(err => console.error("PDF Load Error", err));
+            }
         }
         
         fetch(`data/${lessonId}.json`)

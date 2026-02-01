@@ -1,0 +1,86 @@
+[
+  {
+    "thai": "สวัสดี",
+    "phonetic": "sa-wat-dee",
+    "chinese": "你好 / 您好",
+    "page": 1
+  },
+  {
+    "thai": "สวัสดีครับ",
+    "phonetic": "sa-wat-dee krap",
+    "chinese": "你好（男）",
+    "page": 1
+  },
+  {
+    "thai": "สวัสดีค่ะ",
+    "phonetic": "sa-wat-dee ka",
+    "chinese": "你好（女）",
+    "page": 1
+  },
+  {
+    "thai": "ขอบคุณ",
+    "phonetic": "khop-khun",
+    "chinese": "谢谢",
+    "page": 1
+  },
+  {
+    "thai": "ขอโทษ",
+    "phonetic": "khǒo-thôot",
+    "chinese": "对不起 / 不好意思",
+    "page": 1
+  },
+  {
+    "thai": "ฉันชื่อ...",
+    "phonetic": "chan chʉ̂ʉ ...",
+    "chinese": "我叫...",
+    "page": 3
+  },
+  {
+    "thai": "คุณชื่ออะไร",
+    "phonetic": "khun chʉ̂ʉ à-rai",
+    "chinese": "你叫什么名字？",
+    "page": 3
+  },
+  {
+    "thai": "ฉันเป็นคนจีน",
+    "phonetic": "chan pen khon jiin",
+    "chinese": "我是中国人",
+    "page": 3
+  },
+  {
+    "thai": "ยินดีที่ได้รู้จัก",
+    "phonetic": "yin-dii thîi dâi rúu-jàk",
+    "chinese": "很高兴认识你",
+    "page": 3
+  },
+  {
+    "thai": "ฉัน",
+    "phonetic": "chan",
+    "chinese": "我",
+    "page": 5
+  },
+  {
+    "thai": "คุณ",
+    "phonetic": "khun",
+    "chinese": "你",
+    "page": 5
+  },
+  {
+    "thai": "ชื่อ",
+    "phonetic": "chʉ̂ʉ",
+    "chinese": "名字",
+    "page": 5
+  },
+  {
+    "thai": "คนจีน",
+    "phonetic": "khon jiin",
+    "chinese": "中国人",
+    "page": 5
+  },
+  {
+    "thai": "เพื่อน",
+    "phonetic": "phʉ̂an",
+    "chinese": "朋友",
+    "page": 5
+  }
+]

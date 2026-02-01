@@ -192,24 +192,6 @@
     "page": 5
   },
   {
-    "thai": "ผมอยู่ที่...............",
-    "phonetic": "Phom Yu Tii...........",
-    "chinese": "我在...................",
-    "page": 6
-  },
-  {
-    "thai": "ผมอยู่ที่...............",
-    "phonetic": "Phom Yu Tii...........",
-    "chinese": "我在...................",
-    "page": 6
-  },
-  {
-    "thai": "ผมอยู่ที่...............",
-    "phonetic": "Phom Yu Tii...........",
-    "chinese": "我在...................",
-    "page": 6
-  },
-  {
     "thai": "ตื่นนอน",
     "phonetic": "Teun non",
     "chinese": "起床",
@@ -291,6 +273,18 @@
     "thai": "ทำความสะอาด",
     "phonetic": "Thum Kwam Sa Ard",
     "chinese": "打扫",
+    "page": 8
+  },
+  {
+    "thai": "คุณกำลังทำอะไรอยู่",
+    "phonetic": "Khun Kam Lang Thum Arai Yu",
+    "chinese": "你现在在做什么?",
+    "page": 8
+  },
+  {
+    "thai": "ผมกำลัง...................อยู่",
+    "phonetic": "Phom Kam Lang ........... Yu",
+    "chinese": "我正在...................",
     "page": 8
   }
 ]

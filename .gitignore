@@ -1,0 +1,16 @@
+
+# Original large files
+常用泰语100句 - 天天泰语 (720p, h264).mp4
+常用泰语100句 [-q7V-i5dlmA].th-orig.srt
+
+# Intermediate/Old clips
+clips/
+clips_log.txt
+
+# System/Python
+__pycache__/
+*.pyc
+.DS_Store
+
+# Scripts (Optional: keep them if you want to preserve the logic, I'll keep them)
+# *.py

@@ -1,0 +1,157 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>泰语100句洗脑循环</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #000;
+            color: #fff;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+        }
+        #player-container {
+            width: 80%;
+            max-width: 800px;
+            aspect-ratio: 16/9;
+            background: #111;
+            position: relative;
+            box-shadow: 0 0 20px rgba(0,0,0,0.5);
+        }
+        video {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+        #controls-hint {
+            margin-top: 20px;
+            text-align: center;
+            color: #888;
+        }
+        #current-info {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background: rgba(0, 0, 0, 0.5);
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-size: 14px;
+            pointer-events: none;
+        }
+        .key {
+            display: inline-block;
+            background: #333;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: monospace;
+            margin: 0 2px;
+            border: 1px solid #555;
+        }
+    </style>
+</head>
+<body>
+
+<div id="player-container">
+    <video id="video-player" loop playsinline></video>
+    <div id="current-info">加载中...</div>
+</div>
+
+<div id="controls-hint">
+    <p><span class="key">空格</span> 播放/暂停 &nbsp;&nbsp; <span class="key">←</span> 上一个 &nbsp;&nbsp; <span class="key">→</span> 下一个</p>
+    <p id="status-msg">准备就绪</p>
+</div>
+
+<script>
+    let videos = [];
+    let currentIndex = 0;
+    const videoPlayer = document.getElementById('video-player');
+    const infoDisplay = document.getElementById('current-info');
+    const statusMsg = document.getElementById('status-msg');
+
+    // Load video list
+    fetch('videos.json')
+        .then(response => response.json())
+        .then(data => {
+            videos = data;
+            if (videos.length > 0) {
+                loadVideo(0);
+            } else {
+                infoDisplay.textContent = "未找到视频";
+            }
+        })
+        .catch(error => {
+            console.error('Error loading video list:', error);
+            infoDisplay.textContent = "加载列表失败";
+        });
+
+    function loadVideo(index) {
+        if (index < 0) index = videos.length - 1;
+        if (index >= videos.length) index = 0;
+        
+        currentIndex = index;
+        const filename = videos[currentIndex];
+        // Path is relative to where index.html is served
+        videoPlayer.src = `clips_chinese/${filename}`;
+        videoPlayer.play().catch(e => {
+            console.log("Autoplay prevented, waiting for interaction");
+            statusMsg.textContent = "按空格键开始播放";
+        });
+        
+        // Update info
+        // Remove extension for cleaner display
+        const displayName = filename.replace('.mp4', '').replace(/^\d+_/, '');
+        infoDisplay.textContent = `${currentIndex + 1}/${videos.length}: ${displayName}`;
+        statusMsg.textContent = `正在播放: ${displayName}`;
+    }
+
+    function togglePlay() {
+        if (videoPlayer.paused) {
+            videoPlayer.play();
+            statusMsg.textContent = "播放中";
+        } else {
+            videoPlayer.pause();
+            statusMsg.textContent = "已暂停";
+        }
+    }
+
+    function prevVideo() {
+        loadVideo(currentIndex - 1);
+    }
+
+    function nextVideo() {
+        loadVideo(currentIndex + 1);
+    }
+
+    // Keyboard controls
+    document.addEventListener('keydown', (e) => {
+        switch(e.code) {
+            case 'Space':
+                e.preventDefault(); // Prevent scrolling
+                togglePlay();
+                break;
+            case 'ArrowLeft':
+                e.preventDefault();
+                prevVideo();
+                break;
+            case 'ArrowRight':
+                e.preventDefault();
+                nextVideo();
+                break;
+        }
+    });
+
+    // Click on video to toggle
+    videoPlayer.addEventListener('click', togglePlay);
+
+</script>
+
+</body>
+</html>

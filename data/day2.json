@@ -6,7 +6,7 @@
     "page": 1
   },
   {
-    "thai": "แลวคุณละ",
+    "thai": "แล้วคุณล่ะ",
     "phonetic": "Leaw Khun la",
     "chinese": "你呢",
     "page": 1
@@ -24,7 +24,7 @@
     "page": 2
   },
   {
-    "thai": "โรงภาพยนตร/โรงหนัง",
+    "thai": "โรงภาพยนตร์/โรงหนัง",
     "phonetic": "Rong hnang",
     "chinese": "电影院",
     "page": 2
@@ -42,55 +42,55 @@
     "page": 2
   },
   {
-    "thai": "รานคา",
+    "thai": "ร้านค้า",
     "phonetic": "Ran Kha",
     "chinese": "商店",
     "page": 2
   },
   {
-    "thai": "รานสะดวกซื้อ",
+    "thai": "ร้านสะดวกซื้อ",
     "phonetic": "Ran sa dwk sux",
     "chinese": "便利店",
     "page": 2
   },
   {
-    "thai": "รานตัดผม",
+    "thai": "ร้านตัดผม",
     "phonetic": "Ran taad phom",
     "chinese": "理发店",
     "page": 2
   },
   {
-    "thai": "รานขายยา",
+    "thai": "ร้านขายยา",
     "phonetic": "Ran khay yaa",
     "chinese": "药店",
     "page": 2
   },
   {
-    "thai": "รานดอกไม",
+    "thai": "ร้านดอกไม้",
     "phonetic": "Ran dwkmai",
     "chinese": "花店",
     "page": 2
   },
   {
-    "thai": "รานอาหาร",
+    "thai": "ร้านอาหาร",
     "phonetic": "Ran A Hann",
     "chinese": "餐厅",
     "page": 3
   },
   {
-    "thai": "บาร",
+    "thai": "บาร์",
     "phonetic": "Bar",
     "chinese": "酒吧",
     "page": 3
   },
   {
-    "thai": "หางสรรพสินคา",
+    "thai": "ห้างสรรพสินค้า",
     "phonetic": "Hang sappa sinkha",
     "chinese": "商场",
     "page": 3
   },
   {
-    "thai": "ซุปเปอรมารเก็ต",
+    "thai": "ซุปเปอร์มาร์เก็ต",
     "phonetic": "supermarkets",
     "chinese": "超市",
     "page": 3
@@ -108,13 +108,13 @@
     "page": 3
   },
   {
-    "thai": "พิพิธภัณฑ",
+    "thai": "พิพิธภัณฑ์",
     "phonetic": "pi pitaphan",
     "chinese": "博物馆",
     "page": 3
   },
   {
-    "thai": "หอศิลป",
+    "thai": "หอศิลป์",
     "phonetic": "Hor sin",
     "chinese": "美术馆",
     "page": 3
@@ -138,7 +138,7 @@
     "page": 4
   },
   {
-    "thai": "สระวายนํ้า",
+    "thai": "สระว่ายน้ำ",
     "phonetic": "sa waai nam",
     "chinese": "游泳池",
     "page": 4
@@ -150,61 +150,61 @@
     "page": 4
   },
   {
-    "thai": "บาน",
+    "thai": "บ้าน",
     "phonetic": "Baan",
     "chinese": "家",
     "page": 4
   },
   {
-    "thai": "หองนํ้า",
+    "thai": "ห้องน้ำ",
     "phonetic": "Hong Nam",
     "chinese": "洗手间",
     "page": 4
   },
   {
-    "thai": "หองนอน",
+    "thai": "ห้องนอน",
     "phonetic": "hong non",
     "chinese": "卧室",
     "page": 4
   },
   {
-    "thai": "หองนั่งเลน",
+    "thai": "ห้องนั่งเล่น",
     "phonetic": "hong nang lean",
     "chinese": "客厅",
     "page": 4
   },
   {
-    "thai": "หองครัว",
+    "thai": "ห้องครัว",
     "phonetic": "hong krua",
     "chinese": "厨房",
     "page": 4
   },
   {
-    "thai": "ตอนนี้คุณอยูที่ไหน?",
+    "thai": "ตอนนี้คุณอยู่ที่ไหน?",
     "phonetic": "Ton Nii Khun Yu Tii Naii",
     "chinese": "你现在在哪里?",
     "page": 5
   },
   {
-    "thai": "ผมอยูที่...............",
+    "thai": "ผมอยู่ที่...............",
     "phonetic": "Phom Yu Tii...........",
     "chinese": "我在...................",
     "page": 5
   },
   {
-    "thai": "ผมอยูที่...............",
+    "thai": "ผมอยู่ที่...............",
     "phonetic": "Phom Yu Tii...........",
     "chinese": "我在...................",
     "page": 6
   },
   {
-    "thai": "ผมอยูที่...............",
+    "thai": "ผมอยู่ที่...............",
     "phonetic": "Phom Yu Tii...........",
     "chinese": "我在...................",
     "page": 6
   },
   {
-    "thai": "ผมอยูที่...............",
+    "thai": "ผมอยู่ที่...............",
     "phonetic": "Phom Yu Tii...........",
     "chinese": "我在...................",
     "page": 6
@@ -222,13 +222,13 @@
     "page": 7
   },
   {
-    "thai": "ลาง/ซัก",
+    "thai": "ล้าง/ซัก",
     "phonetic": "lang Saak",
     "chinese": "洗",
     "page": 7
   },
   {
-    "thai": "อาบนํ้า",
+    "thai": "อาบน้ำ",
     "phonetic": "Arb Nam",
     "chinese": "洗澡",
     "page": 7
@@ -240,7 +240,7 @@
     "page": 7
   },
   {
-    "thai": "ลางมือ",
+    "thai": "ล้างมือ",
     "phonetic": "Lang Mue",
     "chinese": "洗手",
     "page": 7
@@ -252,13 +252,13 @@
     "page": 7
   },
   {
-    "thai": "ออกกําลังกาย",
+    "thai": "ออกกำลังกาย",
     "phonetic": "Aok Kam Lang Kaii",
     "chinese": "锻炼身体",
     "page": 7
   },
   {
-    "thai": "พักผอน",
+    "thai": "พักผ่อน",
     "phonetic": "Phak Paon",
     "chinese": "休息",
     "page": 7
@@ -270,25 +270,25 @@
     "page": 7
   },
   {
-    "thai": "ทํางาน",
+    "thai": "ทำงาน",
     "phonetic": "Thum Ngan",
     "chinese": "工作",
     "page": 8
   },
   {
-    "thai": "เลน",
+    "thai": "เล่น",
     "phonetic": "Lean",
     "chinese": "玩",
     "page": 8
   },
   {
-    "thai": "ทําอาหาร",
+    "thai": "ทำอาหาร",
     "phonetic": "Thum Ar Han",
     "chinese": "做饭",
     "page": 8
   },
   {
-    "thai": "ทําความสะอาด",
+    "thai": "ทำความสะอาด",
     "phonetic": "Thum Kwam Sa Ard",
     "chinese": "打扫",
     "page": 8

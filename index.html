@@ -103,7 +103,7 @@
 <body>
 
 <div id="player-container">
-    <video id="video-player" loop playsinline></video>
+    <video id="video-player" playsinline></video>
     <div id="current-info">加载中...</div>
 </div>
 
@@ -120,9 +120,23 @@
 <script>
     let videos = [];
     let currentIndex = 0;
+    let loopCount = 0;
+    const MAX_LOOPS = 3;
+    
     const videoPlayer = document.getElementById('video-player');
     const infoDisplay = document.getElementById('current-info');
     const statusMsg = document.getElementById('status-msg');
+
+    // Handle video ended event
+    videoPlayer.addEventListener('ended', () => {
+        loopCount++;
+        if (loopCount < MAX_LOOPS) {
+            videoPlayer.play();
+            statusMsg.textContent = `重播 (${loopCount + 1}/${MAX_LOOPS})`;
+        } else {
+            nextVideo();
+        }
+    });
 
     // Load video list
     fetch('videos.json')
@@ -145,6 +159,8 @@
         if (index >= videos.length) index = 0;
         
         currentIndex = index;
+        loopCount = 0; // Reset loop counter
+        
         const filename = videos[currentIndex];
         // Path is relative to where index.html is served
         videoPlayer.src = `clips_chinese/${filename}`;

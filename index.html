@@ -393,7 +393,12 @@
     <div class="lesson-header">
         <button class="control-btn" onclick="switchView('lessons')">← 返回列表</button>
         <h2 id="lesson-title">课程内容</h2>
-        <button class="control-btn main-btn" onclick="startLessonQuiz()" style="margin-left: auto;">开始练习</button>
+        <div style="margin-left: auto; display: flex; gap: 10px;">
+            <select id="lesson-group-selector" onchange="changeLessonGroup(this.value)" style="padding: 5px; border-radius: 4px; background: #333; color: white; border: 1px solid #555;">
+                <!-- Populated by JS -->
+            </select>
+            <button class="control-btn main-btn" onclick="startLessonAutoPlay()">开始学习</button>
+        </div>
     </div>
     <div id="lesson-content" class="lesson-content">
         <!-- Content injected by JS -->
@@ -446,6 +451,15 @@
     // --- Lesson Logic ---
     let currentPdfDoc = null;
     let currentLessonItems = [];
+    let currentLessonGroupIndex = 0;
+    const LESSON_GROUP_SIZE = 5;
+    
+    // Auto Play State
+    let isLessonAutoPlaying = false;
+    let currentLessonItemIndex = 0; // Index within the group (0-4)
+    let currentLessonItemLoop = 0;
+    const LESSON_ITEM_LOOPS = 5;
+    let autoPlayTimeout = null;
 
     function openLesson(lessonId) {
         switchView('lesson-detail');
@@ -453,6 +467,9 @@
         
         const contentDiv = document.getElementById('lesson-content');
         contentDiv.innerHTML = '<p style="text-align:center;">加载中...</p>';
+        
+        // Stop any previous autoplay
+        stopLessonAutoPlay();
         
         // Load PDF Doc if needed (for Day 2)
         if (lessonId === 'day2' && !currentPdfDoc) {
@@ -467,7 +484,8 @@
             .then(res => res.json())
             .then(data => {
                 currentLessonItems = data;
-                renderLessonContent(data);
+                initLessonGroups();
+                loadLessonGroup(0);
             })
             .catch(err => {
                 contentDiv.innerHTML = '<p style="text-align:center; color:red;">加载失败</p>';
@@ -475,13 +493,45 @@
             });
     }
     
+    function initLessonGroups() {
+        const selector = document.getElementById('lesson-group-selector');
+        selector.innerHTML = '';
+        const totalGroups = Math.ceil(currentLessonItems.length / LESSON_GROUP_SIZE);
+        
+        for (let i = 0; i < totalGroups; i++) {
+            const start = i * LESSON_GROUP_SIZE + 1;
+            const end = Math.min((i + 1) * LESSON_GROUP_SIZE, currentLessonItems.length);
+            const option = document.createElement('option');
+            option.value = i;
+            option.textContent = `第 ${i + 1} 组 (${start}-${end})`;
+            selector.appendChild(option);
+        }
+    }
+    
+    function changeLessonGroup(index) {
+        stopLessonAutoPlay();
+        loadLessonGroup(parseInt(index));
+    }
+    
+    function loadLessonGroup(groupIndex) {
+        currentLessonGroupIndex = groupIndex;
+        document.getElementById('lesson-group-selector').value = groupIndex;
+        
+        const start = groupIndex * LESSON_GROUP_SIZE;
+        const end = Math.min((groupIndex + 1) * LESSON_GROUP_SIZE, currentLessonItems.length);
+        const groupItems = currentLessonItems.slice(start, end);
+        
+        renderLessonContent(groupItems);
+    }
+    
     function renderLessonContent(items) {
         const container = document.getElementById('lesson-content');
         container.innerHTML = '';
         
-        items.forEach(item => {
+        items.forEach((item, index) => {
             const div = document.createElement('div');
             div.className = 'vocab-item';
+            div.id = `vocab-item-${index}`; // Add ID for highlighting
             
             // Escape quotes for inline onclick
             const safeThai = item.thai.replace(/'/g, "\\'");
@@ -505,19 +555,97 @@
         });
     }
 
-    function playAudio(text, lang) {
+    function playAudio(text, lang, onEndCallback) {
         if ('speechSynthesis' in window) {
             // Cancel previous
             window.speechSynthesis.cancel();
             
             const utterance = new SpeechSynthesisUtterance(text);
             utterance.lang = lang;
-            // Fallback for Thai if not supported by browser default voices?
-            // Usually works on iOS/Android/macOS.
+            
+            if (onEndCallback) {
+                utterance.onend = onEndCallback;
+            }
+            
             window.speechSynthesis.speak(utterance);
         } else {
             alert('您的浏览器不支持语音播放');
+            if (onEndCallback) onEndCallback();
         }
+    }
+    
+    // --- Lesson Auto Play Logic ---
+    
+    function startLessonAutoPlay() {
+        if (isLessonAutoPlaying) {
+            stopLessonAutoPlay();
+            return;
+        }
+        
+        const btn = document.querySelector('#lesson-group-selector + button');
+        btn.textContent = "停止学习";
+        btn.classList.add('wrong'); // Red color to indicate stop action
+        
+        isLessonAutoPlaying = true;
+        currentLessonItemIndex = 0;
+        currentLessonItemLoop = 0;
+        
+        playNextLessonItem();
+    }
+    
+    function stopLessonAutoPlay() {
+        isLessonAutoPlaying = false;
+        window.speechSynthesis.cancel();
+        clearTimeout(autoPlayTimeout);
+        
+        const btn = document.querySelector('#lesson-group-selector + button');
+        if (btn) {
+            btn.textContent = "开始学习";
+            btn.classList.remove('wrong');
+        }
+        
+        // Remove highlights
+        document.querySelectorAll('.vocab-item').forEach(el => el.style.borderLeftColor = '#0070f3');
+    }
+    
+    function playNextLessonItem() {
+        if (!isLessonAutoPlaying) return;
+        
+        const start = currentLessonGroupIndex * LESSON_GROUP_SIZE;
+        const groupItems = currentLessonItems.slice(start, Math.min((currentLessonGroupIndex + 1) * LESSON_GROUP_SIZE, currentLessonItems.length));
+        
+        // Check if group finished
+        if (currentLessonItemIndex >= groupItems.length) {
+            // Group finished -> Start Quiz
+            stopLessonAutoPlay();
+            startLessonQuiz(true); // Pass true to indicate it's from auto-play
+            return;
+        }
+        
+        const item = groupItems[currentLessonItemIndex];
+        
+        // Highlight current item
+        document.querySelectorAll('.vocab-item').forEach(el => el.style.borderLeftColor = '#0070f3');
+        const currentEl = document.getElementById(`vocab-item-${currentLessonItemIndex}`);
+        if (currentEl) {
+            currentEl.style.borderLeftColor = '#4CAF50';
+            currentEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+        
+        // Play audio (Thai only for drill? Or Thai then Chinese? Usually Drill = Target Language)
+        // User said "Repeat 5 times". Let's assume Thai.
+        playAudio(item.thai, 'th-TH', () => {
+            currentLessonItemLoop++;
+            if (currentLessonItemLoop < LESSON_ITEM_LOOPS) {
+                // Delay slightly between loops
+                autoPlayTimeout = setTimeout(playNextLessonItem, 500);
+            } else {
+                // Move to next item
+                currentLessonItemIndex++;
+                currentLessonItemLoop = 0;
+                autoPlayTimeout = setTimeout(playNextLessonItem, 1000);
+            }
+        });
     }
     
     function viewPdfPage(pageNum) {
@@ -675,7 +803,7 @@
         showQuizQuestion();
     }
     
-    function startLessonQuiz() {
+    function startLessonQuiz(isAutoPlayTriggered = false) {
         if (!currentLessonItems || currentLessonItems.length === 0) {
             alert("没有可用的练习内容");
             return;
@@ -687,7 +815,25 @@
         // Stop any playing video
         videoPlayer.pause();
         
-        currentQuizLessonItems = currentLessonItems;
+        // If triggered by autoplay, we quiz ONLY the current group items
+        if (isAutoPlayTriggered) {
+             const start = currentLessonGroupIndex * LESSON_GROUP_SIZE;
+             const end = Math.min((currentLessonGroupIndex + 1) * LESSON_GROUP_SIZE, currentLessonItems.length);
+             currentQuizLessonItems = currentLessonItems.slice(start, end);
+        } else {
+             // Otherwise quiz all items? Or maybe just current group if user manually clicks?
+             // Let's stick to current group for consistency if group selector is active
+             // Actually, the "Start Quiz" button was removed in favor of "Start Learning".
+             // But if we want a manual "Test Me" button, we could add it back.
+             // For now, let's assume this is called mainly by autoplay or if we add a button later.
+             
+             // If manual button is re-added, we might want to test whole lesson or just group.
+             // Given the UI change, let's default to current group as well.
+             const start = currentLessonGroupIndex * LESSON_GROUP_SIZE;
+             const end = Math.min((currentLessonGroupIndex + 1) * LESSON_GROUP_SIZE, currentLessonItems.length);
+             currentQuizLessonItems = currentLessonItems.slice(start, end);
+        }
+        
         currentQuizIndex = 0;
         quizScore = 0;
         showQuizQuestion();
@@ -814,6 +960,12 @@
     
     function nextQuizQuestion() {
         currentQuizIndex++;
+        if (quizType === 'lesson' && currentQuizIndex >= currentQuizLessonItems.length) {
+            // Lesson Quiz Finished
+            alert(`测试完成！得分: ${quizScore}/${currentQuizLessonItems.length}`);
+            closeQuiz();
+            return;
+        }
         showQuizQuestion();
     }
     

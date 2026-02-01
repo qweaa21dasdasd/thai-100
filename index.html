@@ -272,16 +272,16 @@
     }
     
     function changeGroup(groupIndex) {
-        loadVideo(groupIndex * GROUP_SIZE);
+        loadVideo(groupIndex * GROUP_SIZE, true);
         videoPlayer.focus();
     }
 
-    function loadVideo(index) {
+    function loadVideo(index, ignoreQuiz = false) {
         if (index < 0) index = videos.length - 1;
         if (index >= videos.length) index = 0;
         
         // Check group boundary for Quiz trigger (only when moving forward)
-        if (index > 0 && index % GROUP_SIZE === 0 && currentIndex === index - 1) {
+        if (!ignoreQuiz && index > 0 && index % GROUP_SIZE === 0 && currentIndex === index - 1) {
             startQuiz(Math.floor((index - 1) / GROUP_SIZE));
             return;
         }
@@ -435,9 +435,9 @@
         const nextGroupStartIndex = (currentGroup + 1) * GROUP_SIZE;
         
         if (nextGroupStartIndex < videos.length) {
-            loadVideo(nextGroupStartIndex);
+            loadVideo(nextGroupStartIndex, true);
         } else {
-            loadVideo(0); // Restart from beginning if all done
+            loadVideo(0, true); // Restart from beginning if all done
         }
     }
 

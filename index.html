@@ -55,6 +55,49 @@
             margin: 0 2px;
             border: 1px solid #555;
         }
+        
+        /* Mobile controls */
+        .mobile-controls {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-bottom: 10px;
+        }
+        .control-btn {
+            background: #333;
+            color: #fff;
+            border: 1px solid #555;
+            padding: 10px 20px;
+            border-radius: 20px;
+            font-size: 16px;
+            cursor: pointer;
+            touch-action: manipulation;
+        }
+        .control-btn:active {
+            background: #555;
+        }
+        .main-btn {
+            background: #0070f3;
+            border-color: #0070f3;
+            font-weight: bold;
+        }
+        .main-btn:active {
+            background: #0051a2;
+        }
+        
+        /* Responsive visibility */
+        .desktop-hint {
+            display: none;
+        }
+        
+        @media (min-width: 768px) {
+            .mobile-controls {
+                display: none;
+            }
+            .desktop-hint {
+                display: block;
+            }
+        }
     </style>
 </head>
 <body>
@@ -65,7 +108,12 @@
 </div>
 
 <div id="controls-hint">
-    <p><span class="key">空格</span> 播放/暂停 &nbsp;&nbsp; <span class="key">←</span> 上一个 &nbsp;&nbsp; <span class="key">→</span> 下一个</p>
+    <p class="desktop-hint"><span class="key">空格</span> 播放/暂停 &nbsp;&nbsp; <span class="key">←</span> 上一个 &nbsp;&nbsp; <span class="key">→</span> 下一个</p>
+    <div class="mobile-controls">
+        <button class="control-btn" onclick="prevVideo()">上一句</button>
+        <button class="control-btn main-btn" onclick="togglePlay()">播放/暂停</button>
+        <button class="control-btn" onclick="nextVideo()">下一句</button>
+    </div>
     <p id="status-msg">准备就绪</p>
 </div>
 

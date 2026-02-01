@@ -14,3 +14,4 @@ __pycache__/
 
 # Scripts (Optional: keep them if you want to preserve the logic, I'll keep them)
 # *.py
+.vercel

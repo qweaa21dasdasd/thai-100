@@ -402,11 +402,13 @@
             document.getElementById('quiz-result').style.color = "#ef5350";
         }
         
-        document.getElementById('quiz-skip-btn').style.display = 'none'; // Hide skip after answering
-
         if (currentQuizIndex < quizQuestions.length - 1) {
-            document.getElementById('quiz-next-btn').style.display = 'inline-block';
+            const nextBtn = document.getElementById('quiz-next-btn');
+            nextBtn.textContent = "继续测试";
+            nextBtn.style.display = 'inline-block';
+            // Keep skip button visible
         } else {
+            document.getElementById('quiz-skip-btn').style.display = 'none'; // Hide skip when finished
             document.getElementById('quiz-close-btn').textContent = `测试结束 (得分: ${quizScore}/5) - 继续学习`;
             document.getElementById('quiz-close-btn').style.display = 'inline-block';
         }

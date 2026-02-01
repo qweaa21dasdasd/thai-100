@@ -703,40 +703,75 @@
     // function renderLessonContent(items) { ... }
 
     function playAudio(text, lang, onEndCallback) {
+        // Try Web Speech API first
         if ('speechSynthesis' in window) {
-            // Mobile browsers often require user interaction to unlock audio context.
-            // Also, voices might need to be loaded.
-            
-            // Cancel previous
             window.speechSynthesis.cancel();
+            
+            // Check for voices
+            const voices = window.speechSynthesis.getVoices();
+            const thaiVoice = voices.find(v => v.lang === 'th-TH' || v.lang === 'th');
+            
+            // If requesting Thai but no Thai voice, fallback to Google TTS immediately
+            if (lang.startsWith('th') && !thaiVoice && voices.length > 0) {
+                console.warn("No Thai voice found, using fallback.");
+                playAudioFallback(text, lang, onEndCallback);
+                return;
+            }
             
             const utterance = new SpeechSynthesisUtterance(text);
             utterance.lang = lang;
+            if (thaiVoice) utterance.voice = thaiVoice;
             
-            // Try to set voice specifically if possible (some Androids/iOS need this)
-            // But getting voices is async. For now let's trust lang.
+            utterance.onend = () => {
+                if (onEndCallback) onEndCallback();
+            };
             
-            if (onEndCallback) {
-                utterance.onend = onEndCallback;
-            }
-            
-            // Error handling
             utterance.onerror = (e) => {
                 console.error("SpeechSynthesis Error:", e);
-                if (onEndCallback) onEndCallback();
+                // If error, try fallback
+                playAudioFallback(text, lang, onEndCallback);
             };
             
             window.speechSynthesis.speak(utterance);
             
-            // Resume if stuck (Chrome bug workaround)
             if (window.speechSynthesis.paused) {
                 window.speechSynthesis.resume();
             }
             
         } else {
-            alert('您的浏览器不支持语音播放');
-            if (onEndCallback) onEndCallback();
+            playAudioFallback(text, lang, onEndCallback);
         }
+    }
+    
+    function playAudioFallback(text, lang, onEndCallback) {
+        // Fallback to Google Translate TTS (unofficial but works for simple testing)
+        // Note: 'zh-CN' for Chinese, 'th' for Thai
+        const targetLang = lang === 'zh-CN' ? 'zh-CN' : 'th';
+        const url = `https://translate.google.com/translate_tts?ie=UTF-8&q=${encodeURIComponent(text)}&tl=${targetLang}&client=tw-ob`;
+        
+        const audio = new Audio(url);
+        
+        audio.onended = () => {
+            if (onEndCallback) onEndCallback();
+        };
+        
+        audio.onerror = (e) => {
+            console.error("Audio Fallback Error:", e);
+            alert("无法播放音频，请检查网络或设备设置");
+            if (onEndCallback) onEndCallback();
+        };
+        
+        audio.play().catch(e => {
+            console.error("Audio Play Error:", e);
+            alert("播放失败，请点击页面触发音频");
+        });
+    }
+
+    // Ensure voices are loaded (async on some browsers)
+    if ('speechSynthesis' in window) {
+        window.speechSynthesis.onvoiceschanged = () => {
+            console.log("Voices loaded:", window.speechSynthesis.getVoices().length);
+        };
     }
     
     // --- Lesson Auto Play Logic ---

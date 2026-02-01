@@ -237,7 +237,7 @@
             box-shadow: 0 4px 8px rgba(0,0,0,0.3);
             background: #1a1a1a;
             border: 2px solid #333;
-            padding: 20px;
+            padding: 10px; /* Reduced padding for mobile */
             box-sizing: border-box;
             text-align: center;
         }
@@ -251,21 +251,24 @@
         }
         
         .card-thai {
-            font-size: 36px;
+            font-size: 32px; /* Smaller font for mobile */
             font-weight: bold;
             color: #fff;
-            margin-bottom: 20px;
+            margin-bottom: 15px;
+            word-break: break-word; /* Prevent overflow */
         }
         .card-phonetic {
-            font-size: 18px;
+            font-size: 16px;
             color: #aaa;
             font-family: monospace;
-            margin-bottom: 20px;
+            margin-bottom: 15px;
+            word-break: break-word;
         }
         .card-chinese {
-            font-size: 28px;
+            font-size: 24px;
             color: #4CAF50;
             font-weight: bold;
+            margin-bottom: 15px; /* Add margin */
         }
         .card-hint {
             position: absolute;
@@ -701,17 +704,35 @@
 
     function playAudio(text, lang, onEndCallback) {
         if ('speechSynthesis' in window) {
+            // Mobile browsers often require user interaction to unlock audio context.
+            // Also, voices might need to be loaded.
+            
             // Cancel previous
             window.speechSynthesis.cancel();
             
             const utterance = new SpeechSynthesisUtterance(text);
             utterance.lang = lang;
             
+            // Try to set voice specifically if possible (some Androids/iOS need this)
+            // But getting voices is async. For now let's trust lang.
+            
             if (onEndCallback) {
                 utterance.onend = onEndCallback;
             }
             
+            // Error handling
+            utterance.onerror = (e) => {
+                console.error("SpeechSynthesis Error:", e);
+                if (onEndCallback) onEndCallback();
+            };
+            
             window.speechSynthesis.speak(utterance);
+            
+            // Resume if stuck (Chrome bug workaround)
+            if (window.speechSynthesis.paused) {
+                window.speechSynthesis.resume();
+            }
+            
         } else {
             alert('您的浏览器不支持语音播放');
             if (onEndCallback) onEndCallback();
@@ -724,6 +745,13 @@
         if (isLessonAutoPlaying) {
             stopLessonAutoPlay();
             return;
+        }
+        
+        // Mobile iOS requirement: Audio must be triggered by user interaction first.
+        // We can play a silent sound or just start speaking immediately since this function IS called by a click event.
+        if ('speechSynthesis' in window) {
+             window.speechSynthesis.cancel();
+             // Just a dummy speak to 'unlock' audio on some devices if needed, though usually direct call works.
         }
         
         const btn = document.querySelector('#lesson-group-selector + button');

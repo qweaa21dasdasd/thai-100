@@ -334,7 +334,15 @@
         }
     </style>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
-    <script>
+    <!-- PDF Modal -->
+<div id="pdf-modal">
+    <button class="close-modal" onclick="closePdfModal()">关闭</button>
+    <div id="pdf-canvas-container">
+        <canvas id="pdf-canvas"></canvas>
+    </div>
+</div>
+
+<script>
         pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
     </script>
 </head>
@@ -353,20 +361,6 @@
         <select id="group-selector" onchange="changeGroup(this.value)">
             <!-- Options populated by JS -->
         </select>
-        
-        <div id="quiz-overlay">
-            <div class="quiz-title">阶段测试</div>
-            <div class="quiz-question" id="quiz-question-text">听录音，选择正确的中文含义</div>
-            <div class="quiz-options" id="quiz-options">
-                <!-- Buttons injected by JS -->
-            </div>
-            <div id="quiz-result" style="margin-top: 20px; font-weight: bold;"></div>
-            <div style="margin-top: 20px; display: flex; gap: 10px;">
-                 <button id="quiz-skip-btn" class="control-btn" onclick="closeQuiz()">跳过测试</button>
-                 <button id="quiz-next-btn" class="control-btn main-btn" style="display:none;" onclick="nextQuizQuestion()">继续测试</button>
-                 <button id="quiz-close-btn" class="control-btn" style="display:none;" onclick="closeQuiz()">结束测试</button>
-            </div>
-        </div>
     </div>
 
     <div id="controls-hint">
@@ -399,6 +393,7 @@
     <div class="lesson-header">
         <button class="control-btn" onclick="switchView('lessons')">← 返回列表</button>
         <h2 id="lesson-title">课程内容</h2>
+        <button class="control-btn main-btn" onclick="startLessonQuiz()" style="margin-left: auto;">开始练习</button>
     </div>
     <div id="lesson-content" class="lesson-content">
         <!-- Content injected by JS -->
@@ -406,11 +401,18 @@
     </div>
 </div>
 
-<!-- PDF Modal -->
-<div id="pdf-modal">
-    <button class="close-modal" onclick="closePdfModal()">关闭</button>
-    <div id="pdf-canvas-container">
-        <canvas id="pdf-canvas"></canvas>
+<!-- Quiz Overlay (Moved to body level) -->
+<div id="quiz-overlay">
+    <div class="quiz-title">阶段测试</div>
+    <div class="quiz-question" id="quiz-question-text">听录音，选择正确的中文含义</div>
+    <div class="quiz-options" id="quiz-options">
+        <!-- Buttons injected by JS -->
+    </div>
+    <div id="quiz-result" style="margin-top: 20px; font-weight: bold;"></div>
+    <div style="margin-top: 20px; display: flex; gap: 10px;">
+         <button id="quiz-skip-btn" class="control-btn" onclick="closeQuiz()">跳过测试</button>
+         <button id="quiz-next-btn" class="control-btn main-btn" style="display:none;" onclick="nextQuizQuestion()">继续测试</button>
+         <button id="quiz-close-btn" class="control-btn" style="display:none;" onclick="closeQuiz()">结束测试</button>
     </div>
 </div>
 
@@ -443,6 +445,7 @@
 
     // --- Lesson Logic ---
     let currentPdfDoc = null;
+    let currentLessonItems = [];
 
     function openLesson(lessonId) {
         switchView('lesson-detail');
@@ -463,6 +466,7 @@
         fetch(`data/${lessonId}.json`)
             .then(res => res.json())
             .then(data => {
+                currentLessonItems = data;
                 renderLessonContent(data);
             })
             .catch(err => {
@@ -556,10 +560,12 @@
     
     // Quiz State
     let isQuizMode = false;
+    let quizType = 'video'; // 'video' or 'lesson'
     let currentQuizIndex = 0;
     let quizScore = 0;
     let currentQuizQuestion = null;
     let currentQuizGroupVideos = [];
+    let currentQuizLessonItems = [];
     
     const videoPlayer = document.getElementById('video-player');
     const infoDisplay = document.getElementById('current-info');
@@ -653,10 +659,12 @@
     // --- Quiz Logic ---
     
     function startQuiz(groupIndex) {
+        quizType = 'video';
         isQuizMode = true;
-        playerContainer.classList.add('quiz-active');
+        playerContainer.classList.add('quiz-active'); // Keep this for CSS styling hooks if needed, though overlay is now global
+        quizOverlay.style.display = 'flex'; // Show global overlay
         videoPlayer.classList.add('blur');
-        videoPlayer.loop = false; // Disable loop for quiz
+        videoPlayer.loop = false; 
         
         const start = groupIndex * GROUP_SIZE;
         const end = Math.min((groupIndex + 1) * GROUP_SIZE, videos.length);
@@ -667,26 +675,27 @@
         showQuizQuestion();
     }
     
-    function showQuizQuestion() {
-        // Generate a new question dynamically
-        const groupVideos = currentQuizGroupVideos;
-        const targetVideo = groupVideos[Math.floor(Math.random() * groupVideos.length)];
-        // Distractors
-        const options = [targetVideo];
-        while (options.length < 4) {
-            const random = groupVideos[Math.floor(Math.random() * groupVideos.length)];
-            if (!options.includes(random)) options.push(random);
+    function startLessonQuiz() {
+        if (!currentLessonItems || currentLessonItems.length === 0) {
+            alert("没有可用的练习内容");
+            return;
         }
-        // Shuffle options
-        options.sort(() => Math.random() - 0.5);
+        quizType = 'lesson';
+        isQuizMode = true;
+        quizOverlay.style.display = 'flex';
         
-        currentQuizQuestion = {
-            target: targetVideo,
-            options: options
-        };
+        // Stop any playing video
+        videoPlayer.pause();
         
-        const q = currentQuizQuestion;
-        
+        currentQuizLessonItems = currentLessonItems;
+        currentQuizIndex = 0;
+        quizScore = 0;
+        showQuizQuestion();
+    }
+    
+    function showQuizQuestion() {
+        // Clear previous state
+        const questionText = document.getElementById('quiz-question-text');
         const optionsContainer = document.getElementById('quiz-options');
         const resultDiv = document.getElementById('quiz-result');
         const nextBtn = document.getElementById('quiz-next-btn');
@@ -700,17 +709,64 @@
         closeBtn.style.display = 'none';
         skipBtn.style.display = 'inline-block'; 
         
-        // Play Audio (Video is blurred)
-        videoPlayer.src = `clips_chinese/${q.target}`;
-        videoPlayer.play();
+        let target, options;
         
-        document.querySelector('.quiz-title').textContent = `听力测试 (第 ${currentQuizIndex + 1} 题)`;
+        if (quizType === 'video') {
+            const groupVideos = currentQuizGroupVideos;
+            target = groupVideos[Math.floor(Math.random() * groupVideos.length)];
+            options = [target];
+            while (options.length < 4) {
+                const random = groupVideos[Math.floor(Math.random() * groupVideos.length)];
+                if (!options.includes(random)) options.push(random);
+            }
+            
+            // Play Audio
+            videoPlayer.src = `clips_chinese/${target}`;
+            videoPlayer.play();
+            questionText.textContent = "听录音，选择正确的中文含义";
+            
+        } else {
+            // Lesson Mode
+            const items = currentQuizLessonItems;
+            target = items[Math.floor(Math.random() * items.length)];
+            options = [target];
+            while (options.length < 4) {
+                const random = items[Math.floor(Math.random() * items.length)];
+                if (options.indexOf(random) === -1) options.push(random);
+            }
+            
+            // Play TTS
+            playAudio(target.thai, 'th-TH');
+            questionText.textContent = "听读音/看泰语，选择正确的中文含义";
+            // Show Thai text in question area for lesson mode? Or just audio?
+            // User said "similar rules", 100 sentences is audio only.
+            // But TTS might be hard. Let's show Thai text as a hint?
+            // Actually, let's show Thai text above options.
+            questionText.innerHTML = `<div style="font-size:32px; color:#0070f3; margin-bottom:10px;">${target.thai}</div>听读音，选择正确的中文含义`;
+        }
         
-        q.options.forEach(opt => {
+        // Shuffle options
+        options.sort(() => Math.random() - 0.5);
+        
+        currentQuizQuestion = {
+            target: target,
+            options: options
+        };
+        
+        document.querySelector('.quiz-title').textContent = `测试中 (第 ${currentQuizIndex + 1} 题)`;
+        
+        currentQuizQuestion.options.forEach(opt => {
             const btn = document.createElement('button');
             btn.className = 'quiz-btn';
-            btn.textContent = getDisplayName(opt);
-            btn.onclick = () => checkAnswer(btn, opt, q.target);
+            
+            if (quizType === 'video') {
+                btn.textContent = getDisplayName(opt);
+                btn.onclick = () => checkAnswer(btn, opt, currentQuizQuestion.target);
+            } else {
+                btn.textContent = opt.chinese;
+                btn.onclick = () => checkAnswer(btn, opt, currentQuizQuestion.target);
+            }
+            
             optionsContainer.appendChild(btn);
         });
     }
@@ -719,7 +775,17 @@
         const buttons = document.querySelectorAll('.quiz-btn');
         buttons.forEach(b => b.disabled = true); // Disable all
         
-        const isCorrect = selected === correct;
+        let isCorrect = false;
+        let correctText = "";
+        
+        if (quizType === 'video') {
+            isCorrect = selected === correct;
+            correctText = getDisplayName(correct);
+        } else {
+            isCorrect = selected.thai === correct.thai; // Compare unique ID ideally, but Thai text works
+            correctText = correct.chinese;
+        }
+
         if (isCorrect) {
             btn.classList.add('correct');
             quizScore++;
@@ -729,11 +795,11 @@
             btn.classList.add('wrong');
             // Highlight correct one
             buttons.forEach(b => {
-                if (b.textContent === getDisplayName(correct)) {
+                if (b.textContent === correctText) {
                     b.classList.add('correct');
                 }
             });
-            document.getElementById('quiz-result').textContent = `回答错误 ❌ 正确答案是: ${getDisplayName(correct)}`;
+            document.getElementById('quiz-result').textContent = `回答错误 ❌ 正确答案是: ${correctText}`;
             document.getElementById('quiz-result').style.color = "#ef5350";
         }
         
@@ -742,8 +808,8 @@
         nextBtn.textContent = "继续测试";
         nextBtn.style.display = 'inline-block';
         
-        // Update score display in title (optional but nice)
-        document.querySelector('.quiz-title').textContent = `听力测试 (第 ${currentQuizIndex + 1} 题 | 得分: ${quizScore})`;
+        // Update score
+        document.querySelector('.quiz-title').textContent = `测试中 (第 ${currentQuizIndex + 1} 题 | 得分: ${quizScore})`;
     }
     
     function nextQuizQuestion() {
@@ -753,25 +819,24 @@
     
     function closeQuiz() {
         isQuizMode = false;
-        playerContainer.classList.remove('quiz-active');
-        videoPlayer.classList.remove('blur');
+        quizOverlay.style.display = 'none';
         
-        // Resume learning from where we left off (start of next group)
-        // The quiz was triggered at index (groupIndex + 1) * GROUP_SIZE
-        // So we just load that index.
-        // We need to calculate it back or store it.
-        // Actually simplest is just load currentIndex + 1 from BEFORE the quiz?
-        // Wait, loadVideo handles index. When we triggered quiz, we were at `index` which was start of next group.
-        // So we should just load that index.
-        
-        // Recalculate next group index
-        const currentGroup = Math.floor((currentIndex) / GROUP_SIZE); // This is the OLD group
-        const nextGroupStartIndex = (currentGroup + 1) * GROUP_SIZE;
-        
-        if (nextGroupStartIndex < videos.length) {
-            loadVideo(nextGroupStartIndex, true);
+        if (quizType === 'video') {
+            playerContainer.classList.remove('quiz-active');
+            videoPlayer.classList.remove('blur');
+            
+            // Resume video logic
+            const currentGroup = Math.floor((currentIndex) / GROUP_SIZE);
+            const nextGroupStartIndex = (currentGroup + 1) * GROUP_SIZE;
+            
+            if (nextGroupStartIndex < videos.length) {
+                loadVideo(nextGroupStartIndex, true);
+            } else {
+                loadVideo(0, true); 
+            }
         } else {
-            loadVideo(0, true); // Restart from beginning if all done
+            // Lesson mode exit
+            // Nothing special to do, just close overlay
         }
     }
 

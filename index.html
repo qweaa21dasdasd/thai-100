@@ -512,6 +512,10 @@
                 <h3>Day 2</h3>
                 <p>日常词汇与句子练习</p>
             </div>
+            <div class="lesson-card" onclick="openLesson('day3')">
+                <h3>Day 3</h3>
+                <p>预约</p>
+            </div>
             <!-- Future lessons can be added here -->
         </div>
     </div>
@@ -598,6 +602,7 @@
         let title = lessonId;
         if (lessonId === 'day1') title = 'Day 1: 问候与介绍';
         if (lessonId === 'day2') title = 'Day 2: 日常词汇与句子';
+        if (lessonId === 'day3') title = 'Day 3: 预约';
         document.getElementById('lesson-title').textContent = title;
         
         const contentDiv = document.getElementById('lesson-content');
@@ -609,7 +614,8 @@
         // PDF Loading Logic
         const pdfMap = {
             'day1': 'kejian/Day%201.pdf',
-            'day2': 'kejian/Day%202.pdf'
+            'day2': 'kejian/Day%202.pdf',
+            'day3': 'kejian/Day%203.pdf'
         };
         
         currentPdfDoc = null; // Reset current doc first

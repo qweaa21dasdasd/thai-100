@@ -1,0 +1,230 @@
+[
+  {
+    "thai": "ว่าง",
+    "phonetic": "waang",
+    "chinese": "有空",
+    "page": 1
+  },
+  {
+    "thai": "ไม่ว่าง",
+    "phonetic": "mai waang",
+    "chinese": "没空",
+    "page": 1
+  },
+  {
+    "thai": "ไป",
+    "phonetic": "bpai",
+    "chinese": "去",
+    "page": 1
+  },
+  {
+    "thai": "กินข้าว",
+    "phonetic": "gin khaao",
+    "chinese": "吃饭",
+    "page": 1
+  },
+  {
+    "thai": "เจอ",
+    "phonetic": "Jer",
+    "chinese": "见面",
+    "page": 1
+  },
+  {
+    "thai": "ได้",
+    "phonetic": "Dai",
+    "chinese": "可以",
+    "page": 1
+  },
+  {
+    "thai": "ไม่ได้",
+    "phonetic": "mai dai",
+    "chinese": "不可以",
+    "page": 1
+  },
+  {
+    "thai": "ว่างไหม?",
+    "phonetic": "waang mai",
+    "chinese": "有空吗",
+    "page": 2
+  },
+  {
+    "thai": "ไปกินข้าวไหม",
+    "phonetic": "bpai gin khaao mai",
+    "chinese": "去吃饭吗",
+    "page": 2
+  },
+  {
+    "thai": "เจอกันไหม",
+    "phonetic": "Jer gan mai",
+    "chinese": "见面吗",
+    "page": 2
+  },
+  {
+    "thai": "วันนี้ว่างไหม?",
+    "phonetic": "wan-nii-waang mai",
+    "chinese": "今天有空吗",
+    "page": 2
+  },
+  {
+    "thai": "วันนี้",
+    "phonetic": "wan-nii",
+    "chinese": "今天",
+    "page": 3
+  },
+  {
+    "thai": "พรุ่งนี้",
+    "phonetic": "phrung-nii",
+    "chinese": "明天",
+    "page": 3
+  },
+  {
+    "thai": "เมื่อวาน",
+    "phonetic": "meu-wan",
+    "chinese": "昨天",
+    "page": 3
+  },
+  {
+    "thai": "เช้านี้",
+    "phonetic": "cao-nii",
+    "chinese": "今天早上",
+    "page": 3
+  },
+  {
+    "thai": "เย็นนี้",
+    "phonetic": "yen-nii",
+    "chinese": "今天晚上",
+    "page": 3
+  },
+  {
+    "thai": "ตอนกลางวัน",
+    "phonetic": "ton-krang-wan",
+    "chinese": "中午",
+    "page": 3
+  },
+  {
+    "thai": "ตอนบ่าย",
+    "phonetic": "ton-baii",
+    "chinese": "下午",
+    "page": 3
+  },
+  {
+    "thai": "ร้านกาแฟ",
+    "phonetic": "Ran-Kafe",
+    "chinese": "咖啡店",
+    "page": 5
+  },
+  {
+    "thai": "สถานีรถไฟใต้ดิน",
+    "phonetic": "Sa-Tha-ni-rod-fai-Tai-din",
+    "chinese": "地铁站",
+    "page": 5
+  },
+  {
+    "thai": "ดื่มกาแฟ",
+    "phonetic": "duem-ka-fe",
+    "chinese": "喝咖啡",
+    "page": 5
+  },
+  {
+    "thai": "วันนี้ว่างไหม",
+    "phonetic": "wan-níi wâang mái",
+    "chinese": "今天有空吗？",
+    "page": 6
+  },
+  {
+    "thai": "ว่าง",
+    "phonetic": "wâang",
+    "chinese": "有空",
+    "page": 6
+  },
+  {
+    "thai": "ไปกินข้าวไหม",
+    "phonetic": "bpai gin khâao mái",
+    "chinese": "去吃饭吗？",
+    "page": 6
+  },
+  {
+    "thai": "ได้เลย",
+    "phonetic": "dâi loei",
+    "chinese": "可以的",
+    "page": 6
+  },
+  {
+    "thai": "เย็นนี้นะ",
+    "phonetic": "yen-níi ná",
+    "chinese": "今晚吧",
+    "page": 6
+  },
+  {
+    "thai": "โอเค",
+    "phonetic": "oo-kay",
+    "chinese": "好的",
+    "page": 6
+  },
+  {
+    "thai": "ดูหนัง",
+    "phonetic": "Doo-nhung",
+    "chinese": "看电影",
+    "page": 6
+  },
+  {
+    "thai": "มา",
+    "phonetic": "Ma",
+    "chinese": "来",
+    "page": 7
+  },
+  {
+    "thai": "ไป",
+    "phonetic": "bpai",
+    "chinese": "去",
+    "page": 7
+  },
+  {
+    "thai": "ดู",
+    "phonetic": "Doo",
+    "chinese": "看",
+    "page": 7
+  },
+  {
+    "thai": "ดื่ม",
+    "phonetic": "dreum",
+    "chinese": "喝",
+    "page": 7
+  },
+  {
+    "thai": "ฟัง",
+    "phonetic": "Fung",
+    "chinese": "听",
+    "page": 7
+  },
+  {
+    "thai": "พูด",
+    "phonetic": "Phoot",
+    "chinese": "说",
+    "page": 7
+  },
+  {
+    "thai": "ร้องเพลง",
+    "phonetic": "Rong pleng",
+    "chinese": "唱歌",
+    "page": 7
+  },
+  {
+    "thai": "กิน",
+    "phonetic": "ginn",
+    "chinese": "吃",
+    "page": 7
+  },
+  {
+    "thai": "วิ่ง",
+    "phonetic": "vwing",
+    "chinese": "跑",
+    "page": 7
+  },
+  {
+    "thai": "ซื้อ",
+    "phonetic": "Sue",
+    "chinese": "买",
+    "page": 7
+  }
+]
